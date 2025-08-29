@@ -9,7 +9,7 @@ using namespace std;
 // #include "shader_utils.h"
 #include "Shader.h"
 #include "Texture3D.h"
-
+#include "Texture2D.h"
 // #include "fling.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
@@ -25,12 +25,17 @@ class ResourceManager{
     public:
         static map<std::string, Shader> shaders;
         static map<std::string, Texture3D> textures;
+        static map<std::string, Texture2D> sprites;
 
         static Shader load_shader(const string vertex_shader_file, const string fragment_shader_file, string name);
 
         static Texture3D load_texture(const vector<string> file, string name);
 
         static Texture3D load_texture(string right, string left, string top, string bottom, string back, string front, string name);
+
+        static Texture2D load_sprite(string file, string name);
+
+        static Texture2D get_sprite(string name);
 
         static Shader get_shader(string name); 
         
@@ -47,7 +52,8 @@ class ResourceManager{
         static Texture3D load_texture_file(string right, string left, string top, string bottom, string back, string front);
 
         static Texture3D load_texture_file(vector<string> file);
-
+    
+        static Texture2D load_sprite_file(string file);
 };
 
 

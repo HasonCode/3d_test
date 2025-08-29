@@ -20,9 +20,10 @@ using namespace std;
 
 class CubeRenderer{
     public:
+        Camera camera;
         GLint coord3d;
         CubeRenderer();
-        CubeRenderer(Shader &shader, Camera &camera);
+        CubeRenderer(Shader &shader, Camera camera);
         ~CubeRenderer();
         void drawCube(Texture3D &texture, glm::vec3 position,
             glm::vec3 size, glm::vec3 rotate, glm::vec3 color);  
@@ -33,7 +34,6 @@ class CubeRenderer{
         GLuint IBO;
         float* vertecies;
         unsigned int* indexes;
-        Camera camera;
         void initRenderData();  
 };
 

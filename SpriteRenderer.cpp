@@ -76,8 +76,8 @@ void SpriteRenderer::initRenderData(){
 
 void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position,
     glm::vec2 size, float rotate, glm::vec3 color){
-        float height=800;
-        float width = 800;
+        float height=2000;
+        float width = 1600;
         this->shader.use();
         this->shader.set_sampler("image",0);
         glm::mat4 projection = glm::ortho(0.0f,width,height,0.0f,-1.0f,1.0f); 

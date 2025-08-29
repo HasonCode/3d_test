@@ -55,16 +55,20 @@ float Camera::recalculate_fov(){
 }
 
 void Camera::move_camera(float x, float y, float z){
-    this->position = glm::vec3(x, y, z);
+    this->position[0] = x;
+    this->position[1] = y;
+    this->position[2] = z;
     update_camera();
 }
 
 void Camera::change_target(float x, float y, float z){
-    this->target = glm::vec3(x, y, z);
+    this->target[0] = x;
+    this->target[1] = y;
+    this->target[2] = z;
     update_camera();
 }
 
 void Camera::update_camera(){
-    this->fov = recalculate_fov();
+    this->fov = glm::radians(45.0f);
     this->aspect_ratio = 1.0f*screen_width/screen_height;
 }

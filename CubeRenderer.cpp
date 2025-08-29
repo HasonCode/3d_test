@@ -21,7 +21,7 @@ CubeRenderer::CubeRenderer(){
     shader = Shader();
 }
 
-CubeRenderer::CubeRenderer(Shader &shader, Camera &camera): shader(shader), camera(camera){
+CubeRenderer::CubeRenderer(Shader &shader, Camera camera): shader(shader), camera(camera){
     this->initRenderData();
     this->shader.use();
     this->shader.set_sampler("cubemap",0);
