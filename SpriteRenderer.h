@@ -26,7 +26,7 @@ class SpriteRenderer{
         SpriteRenderer();
         SpriteRenderer(Shader& shader);
         ~SpriteRenderer();
-        void DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec2 size = glm::vec2(10.0,10.0), float rotate = 0.0, glm::vec3 color = glm::vec3(1.0f));
+        void DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec2 size = glm::vec2(10.0,10.0), float rotate = 0.0, glm::vec3 color = glm::vec3(1.0f), float height = 2000, float width = 1600);
     private:
         Shader shader;
         GLuint quadVAO;

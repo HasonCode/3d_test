@@ -2,6 +2,16 @@
     "files.associations": {
         "vector": "cpp",
         "cmath": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "array": "cpp",
+        "charconv": "cpp",
+        "compare": "cpp",
+        "format": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "variant": "cpp"
     }
 }
