@@ -1,3 +1,6 @@
+/*TO DO: 
+POLISH UP MAIN MAP FOR PARKOUR
+ADD IN REAL SHADING AND LIGHTING*/
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -175,7 +178,7 @@ vector<bool> above_block(CubeRenderer renderer, vector<block> blocks, AABB playe
     ret_arr[1] = false;
     float midx = (player.min.x+player.max.x)/2.0;
     float midz = (player.min.z+player.max.z)/2.0;
-    AABB mod_player = AABB{glm::vec3(midx-4, player.min.y-0.1f, midz-4), glm::vec3(midx+4, player.max.y, midz+4)};
+    AABB mod_player = AABB{glm::vec3(midx-4, player.min.y-0.2f, midz-4), glm::vec3(midx+4, player.max.y, midz+4)};
     for (int i = 0; i < blocks.size(); i++){
         if (AABBManager::check_intersect(mod_player, blocks[i].aabb)){
             ret_arr[0] = true;
@@ -252,8 +255,8 @@ bool key_matters(SDL_Event ev){
 }
 
 void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, SpriteRenderer spriter){
-    // SDL_ShowCursor(SDL_DISABLE);
-    // SDL_SetWindowGrab(window, SDL_TRUE);
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetWindowGrab(window, SDL_TRUE);
     bool flag = true;
     int mouse_state = 0;
     int mousex, mousey;
@@ -295,7 +298,7 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
         prev_y = mousey;
         rotation -= delt_x * turn_speed;
         rotation2 -= delt_y * turn_speed;
-        rotation2 = glm::clamp(rotation2, -1.5f, 1.5f);
+        rotation2 = glm::clamp(rotation2, -1.60f, 1.60f);
         lookx = -look_dist * cos(rotation) * cos(rotation2) + facex;
         lookz = look_dist * sin(rotation) * cos(rotation2) + facez;
         looky = look_dist * sin(rotation2) + facey;
@@ -307,6 +310,7 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
         }
         if (keystates[SDL_SCANCODE_R]){
             lookx=0, looky=2, lookz=0, facex=20, facey=50, facez=20;
+            vert_vel = 0;
         }
         if (keystates[SDL_SCANCODE_S]){
             glm::vec3 camera_pos = glm::vec3(facex, facey, facez);
@@ -478,8 +482,19 @@ int main(int argc, char* argv[]){
         blocks.push_back(make_block(5*i+14, i, 6, MOSS));
 
     }
-    blocks.push_back(make_block(60, 9, 5, GEM));
+    blocks.push_back(make_block(63, 9, 8, MOSS));
 
+    blocks.push_back(make_block(65, 10, 10, MOSS));
+
+    blocks.push_back(make_block(65, 11, 14, MOSS));
+
+    blocks.push_back(make_block(65, 12, 18, MOSS));
+
+    blocks.push_back(make_block(66, 13, 21, MOSS));
+
+    blocks.push_back(make_block(66, 13, 25, GEM));
+
+    
     glViewport(0,0,screen_width,screen_height);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,1);
     glEnable(GL_BLEND);
