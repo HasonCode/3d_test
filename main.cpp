@@ -431,7 +431,7 @@ int main(int argc, char* argv[]){
     manager = AABBManager();
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     SDL_SetThreadPriority(SDL_THREAD_PRIORITY_HIGH);
-    window = SDL_CreateWindow("It's a Fling Party Out Here",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,screen_width,screen_height,
+    window = SDL_CreateWindow("It's hopping time out here",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,screen_width,screen_height,
         SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL
     );
     SDL_GL_CreateContext(window);
