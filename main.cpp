@@ -70,7 +70,7 @@ enum{
 
 vector<string> textures;
 vector<block> blocks;
-
+float theta = 0.0;
 void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> blocks){
     glClearColor(0.7,0.7,1.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -83,9 +83,11 @@ void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> 
     Texture3D texture = ResourceManager::get_texture("testing_cube");
     for (int i = 0; i < blocks.size(); i++){
         texture = ResourceManager::get_texture(textures[blocks[i].type]);
-        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color);
+        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, glm::vec3(300*sin(theta),300,300*cos(theta)));
     }
     renderer.drawCube(texture, glm::vec3(x, y, z), scale, rotation, color);
+    Texture3D light_texture = ResourceManager::get_texture("white_square");
+    renderer.drawCube(light_texture, glm::vec3(300*sin(theta),300,300*cos(theta)), glm::vec3(100,100,100),rotation, glm::vec3(1.0, 1.0, 1.0));
 }
 
 void render_gui(SDL_Window* window, Shader s, SpriteRenderer renderer){
@@ -291,6 +293,7 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
         vert_vel += vert_acc * 1/60.0;
         facey+=vert_vel * 1/60.0;
         looky+=vert_vel * 1/60.0;
+        theta+=1/60.0;
         SDL_GetMouseState(&mousex, &mousey);
         int delt_x = mousex - prev_x; 
         int delt_y = mousey - prev_y;
@@ -375,7 +378,7 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
         if (keystates[SDL_SCANCODE_ESCAPE]){
             return;
         }
-        while(SDL_PollEvent(&ev) && key_matters(ev) ){
+        while(SDL_PollEvent(&ev) && key_matters(ev)){
             if(ev.type==SDL_QUIT){
                 return;
             }
@@ -453,6 +456,7 @@ int main(int argc, char* argv[]){
     ResourceManager::load_texture("sprites/leaves.png", "sprites/leaves.png", "sprites/leaves.png", "sprites/leaves.png", "sprites/leaves.png", "sprites/leaves.png", "leaves");
     ResourceManager::load_texture("sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "mossy_cobble");
     ResourceManager::load_texture("sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "gem_block");
+    ResourceManager::load_texture("sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "white_square");
     textures = {"dirt", "grass", "stone", "cobblestone", "wood", "leaves", "mossy_cobble", "gem_block"};
     ResourceManager::load_shader("shaders/cubemap.vert", "shaders/cubemap.frag", "cubemap");
     ResourceManager::load_shader("shaders/sprite.vert", "shaders/sprite.frag", "sprite");

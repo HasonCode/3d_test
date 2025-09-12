@@ -27,13 +27,14 @@ CubeRenderer::CubeRenderer(Shader &shader, Camera camera): shader(shader), camer
     this->shader.set_sampler("cubemap",0);
     // Get attribute location from shader
     this->coord3d = glGetAttribLocation(shader.ID, "a_pos");
+    this->normal = glGetAttribLocation(shader.ID, "a_normal");
 }
 
 CubeRenderer::~CubeRenderer(){
     glDeleteVertexArrays(1,&this->quadVAO);
 }
 void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
-    glm::vec3 size, glm::vec3 rotate, glm::vec3 color){
+    glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos, glm::vec3 light_color){
     //Begin shader usage
     this->shader.use();
     this->shader.set_sampler("cubemap", 0);
@@ -52,10 +53,20 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
     glm::mat4 view = glm::lookAt(this->camera.position, this->camera.target, this->camera.up);
     glm::mat4 projection = glm::perspective(this->camera.fov, this->camera.aspect_ratio, this->camera.near, this->camera.far);
 
+    this->shader.set_vector3f("camera_pos",camera.position, true);
     this->shader.set_matrix4("projection",projection,true);
     this->shader.set_matrix4("model",model,true);
     this->shader.set_matrix4("view",view,true);
     this->shader.set_vector3f("color",color,true);
+    this->shader.set_vector3f("light.position", light_pos, true);
+    this->shader.set_vector3f("material.ambience", glm::vec3(0.1f, 0.1f, 0.1f), true);
+    this->shader.set_vector3f("material.diffuse", glm::vec3(0.4f, 0.4f, 0.4f), true);
+    this->shader.set_vector3f("material.specular", glm::vec3(0.6f, 0.6f, 0.6f), true);
+    this->shader.set_vector3f("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f), true);
+    this->shader.set_vector3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f), true);
+    this->shader.set_vector3f("light.ambience", glm::vec3(1.0f, 1.0f, 1.0f), true);
+
+    this->shader.set_float("material.shininess", 32.0f);
     glActiveTexture(GL_TEXTURE0);
     texture.bind();
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
@@ -68,12 +79,26 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
         3*sizeof(float),  // Fixed stride for position-only data
         0
       );
+    glBindBuffer(GL_ARRAY_BUFFER, this->Normal_VBO);
+    glEnableVertexAttribArray(this->normal);
+    glVertexAttribPointer(
+        this->normal,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        3*sizeof(float),  // Fixed stride for position-only data
+        0
+      );
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->IBO);
       glDrawElements(GL_TRIANGLES, indices_in_cube, GL_UNSIGNED_INT, 0);
 }
 
 void CubeRenderer::initRenderData(){
-            float cubeVertices[] = {
+    // Create and bind VAO first
+    glGenVertexArrays(1, &this->quadVAO);
+    glBindVertexArray(this->quadVAO);
+
+    float cubeVertices[] = {
                 // Front face (Z = 1)
                 -1.0f, -1.0f,  1.0f,  // 0
                  1.0f, -1.0f,  1.0f,  // 1
@@ -110,6 +135,40 @@ void CubeRenderer::initRenderData(){
                  1.0f, -1.0f,  1.0f,  // 22
                  1.0f, -1.0f, -1.0f   // 23
             };
+    float normals[] = {
+
+        0.0f, 0.0f, 1.0f,  // 0
+        0.0f, 0.0f, 1.0f,  // 1
+        0.0f, 0.0f, 1.0f,  // 2
+        0.0f, 0.0f, 1.0f,  // 3
+
+        0.0f, 0.0f, -1.0f,  // 4
+        0.0f, 0.0f, -1.0f,  // 5   
+        0.0f, 0.0f, -1.0f,  // 6
+        0.0f, 0.0f, -1.0f,  // 7
+
+        -1.0f, 0.0f, 0.0f,  // 8
+        -1.0f, 0.0f, 0.0f,  // 9    
+        -1.0f, 0.0f, 0.0f,  // 10
+        -1.0f, 0.0f, 0.0f,  // 11
+
+        1.0f, 0.0f, 0.0f,  // 12
+        1.0f, 0.0f, 0.0f,  // 13
+        1.0f, 0.0f, 0.0f,  // 14
+        1.0f, 0.0f, 0.0f,  // 15
+
+        0.0f, 1.0f, 0.0f,  // 16
+        0.0f, 1.0f, 0.0f,  // 17
+        0.0f, 1.0f, 0.0f,  // 18
+        0.0f, 1.0f, 0.0f,  // 19
+
+        0.0f, -1.0f, 0.0f,  // 20
+        0.0f, -1.0f, 0.0f,  // 21
+        0.0f, -1.0f, 0.0f,  // 22
+        0.0f, -1.0f, 0.0f   // 23
+
+    };
+
     unsigned int cubeIndices[] = {
         // Front face
         0, 1, 2,   2, 3, 0,
@@ -136,6 +195,11 @@ void CubeRenderer::initRenderData(){
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices),
         cubeVertices, GL_STATIC_DRAW);
 
+    //Create Normals
+    glGenBuffers(1, &Normal_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, Normal_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+    
     //Create Linkings for Cube
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -146,6 +210,16 @@ void CubeRenderer::initRenderData(){
     glEnableVertexAttribArray(this->coord3d);
     glVertexAttribPointer(
       this->coord3d,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      3*sizeof(float),  // Fixed stride for position-only data
+      0
+    );
+    glBindBuffer(GL_ARRAY_BUFFER, Normal_VBO);
+    glEnableVertexAttribArray(this->normal);
+    glVertexAttribPointer(
+      this->normal,
       3,
       GL_FLOAT,
       GL_FALSE,

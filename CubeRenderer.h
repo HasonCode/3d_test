@@ -18,21 +18,26 @@ using namespace std;
 #ifndef CUBE_RENDERER
 #define CUBE_RENDERER
 
+
+
 class CubeRenderer{
     public:
         Camera camera;
         GLint coord3d;
+        GLint normal;
         CubeRenderer();
         CubeRenderer(Shader &shader, Camera camera);
         ~CubeRenderer();
         void drawCube(Texture3D &texture, glm::vec3 position,
-            glm::vec3 size, glm::vec3 rotate, glm::vec3 color);  
+            glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos = glm::vec3(300.0f, 300.0f, 300.0f), glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f));  
     private:
         Shader shader;
         GLuint quadVAO;
         GLuint VBO;
+        GLuint Normal_VBO;
         GLuint IBO;
         float* vertecies;
+        float* normals;
         unsigned int* indexes;
         void initRenderData();  
 };
