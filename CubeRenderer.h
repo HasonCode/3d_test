@@ -29,7 +29,7 @@ class CubeRenderer{
         CubeRenderer(Shader &shader, Camera camera);
         ~CubeRenderer();
         void drawCube(Texture3D &texture, glm::vec3 position,
-            glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos = glm::vec3(300.0f, 300.0f, 300.0f), glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f));  
+            glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos = glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f));  
     private:
         Shader shader;
         GLuint quadVAO;

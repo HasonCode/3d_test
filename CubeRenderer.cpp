@@ -59,14 +59,20 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
     this->shader.set_matrix4("view",view,true);
     this->shader.set_vector3f("color",color,true);
     this->shader.set_vector3f("light.position", light_pos, true);
-    this->shader.set_vector3f("material.ambience", glm::vec3(0.1f, 0.1f, 0.1f), true);
-    this->shader.set_vector3f("material.diffuse", glm::vec3(0.4f, 0.4f, 0.4f), true);
-    this->shader.set_vector3f("material.specular", glm::vec3(0.6f, 0.6f, 0.6f), true);
+    // this->shader.set_vector3f("material.ambience", glm::vec3(0.3f, 0.3f, 0.3f), true);
+    this->shader.set_sampler("material.diffuse", 0);
+    this->shader.set_sampler("material.specular", 0);
     this->shader.set_vector3f("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f), true);
     this->shader.set_vector3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f), true);
     this->shader.set_vector3f("light.ambience", glm::vec3(1.0f, 1.0f, 1.0f), true);
+    this->shader.set_float("light.constant", 1.0f);
+    this->shader.set_float("light.linear", 0.0027f);
+    this->shader.set_float("light.quadratic", 0.0015f);
+    // cout<<glm::length(position-light_pos)<<endl;
+    cout<<light_pos.x<<endl;
 
-    this->shader.set_float("material.shininess", 32.0f);
+
+    this->shader.set_float("material.shininess", 64.0f);
     glActiveTexture(GL_TEXTURE0);
     texture.bind();
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);

@@ -83,11 +83,11 @@ void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> 
     Texture3D texture = ResourceManager::get_texture("testing_cube");
     for (int i = 0; i < blocks.size(); i++){
         texture = ResourceManager::get_texture(textures[blocks[i].type]);
-        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, glm::vec3(300*sin(theta),300,300*cos(theta)));
+        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, glm::vec3(30,30,30));
     }
     renderer.drawCube(texture, glm::vec3(x, y, z), scale, rotation, color);
     Texture3D light_texture = ResourceManager::get_texture("white_square");
-    renderer.drawCube(light_texture, glm::vec3(300*sin(theta),300,300*cos(theta)), glm::vec3(100,100,100),rotation, glm::vec3(1.0, 1.0, 1.0));
+    renderer.drawCube(light_texture, glm::vec3(30,30,30), glm::vec3(1,1,1),rotation, glm::vec3(1.0, 1.0, 1.0), glm::vec3(30,30,30));
 }
 
 void render_gui(SDL_Window* window, Shader s, SpriteRenderer renderer){
