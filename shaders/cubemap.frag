@@ -42,6 +42,7 @@ struct SpotLight{
     vec3 position;
     vec3 direction;
     float cut_off;
+    float outer_cut_off;
 
     vec3 diffuse;
     vec3 specular;
@@ -51,17 +52,21 @@ struct SpotLight{
     float linear;
     float quadratic;
 };
+
+
 #define num_spot_lights 1
+
+
 uniform SpotLight spot_lights[num_spot_lights];
 
 vec3 calc_dir_light(DirLight light, vec3 normal, vec3 view_direction){
     vec3 light_dir = normalize(-light.direction);
     
-    float diff = max(dot(norm, light_dir), 0.0);
+    float diff = max(dot(normal, light_dir), 0.0);
     vec3 diffuse = light.diffuse * diff * textureCube(material.diffuse, tex_cords).rgb;
-    vec3 reflect_dir = reflect(-light_dir, normal);
+    vec3 halfway = normalize(light_dir + view_direction);
 
-    float spec = pow(max(dot(view_direction, reflect_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfway), 0.0), material.shininess);
     vec3 specular = light.specular * spec * textureCube(material.diffuse, tex_cords).rgb;
 
     vec3 ambience = light.ambience * textureCube(material.diffuse, tex_cords).rgb;
@@ -70,17 +75,18 @@ vec3 calc_dir_light(DirLight light, vec3 normal, vec3 view_direction){
 
 vec3 calc_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view_direction){
     vec3 light_dir = normalize(light.position - frag_pos);
+    vec3 halfway = normalize(light_dir + view_direction);
 
-    float diff = max(dot(norm, light_dir), 0.0);
+    float diff = max(dot(normal, light_dir), 0.0);
     vec3 diffuse = light.diffuse * diff * textureCube(material.diffuse, tex_cords).rgb;
-    vec3 reflect_dir = reflect(-light_dir, normal);
+
 
     float dist = length(light.position - frag_pos);
     float attenuation = 1.0/(light.constant + light.linear * dist + light.quadratic * dist * dist);
 
     diffuse*=attenuation;
 
-    float spec = pow(max(dot(view_direction, reflect_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfway), 0.0), material.shininess);
     vec3 specular = light.specular * spec * textureCube(material.diffuse, tex_cords).rgb;
 
     vec3 ambience = light.ambience * textureCube(material.diffuse, tex_cords).rgb;
@@ -95,24 +101,24 @@ vec3 calc_spot_light(SpotLight light, vec3 normal, vec3 frag_pos, vec3 view_dire
     float dist = length(light.position - frag_pos);
     float attenuation = 1.0/(light.constant + light.linear * dist + light.quadratic * dist * dist);
     float angle = dot(light_dir, normalize(-light.direction));
-    if (angle > light.cut_off){
-        float diff = max(dot(norm, light_dir), 0.0);
-        vec3 diffuse = light.diffuse * diff * textureCube(material.diffuse, tex_cords).rgb;
-        vec3 reflect_dir = reflect(-light_dir, normal);
+    float epsilon = light.cut_off - light.outer_cut_off;
+    float intensity = clamp((angle - light.outer_cut_off) / epsilon, 0.0, 1.0);
+    float diff = max(dot(normal, light_dir), 0.0);
+    vec3 diffuse = light.diffuse * diff * textureCube(material.diffuse, tex_cords).rgb;
+    vec3 halfway = normalize(light_dir + view_direction);
 
+    diffuse*=attenuation;
 
-        diffuse*=attenuation;
+    float spec = pow(max(dot(normal, halfway), 0.0), material.shininess);
+    vec3 specular = light.specular * spec * textureCube(material.diffuse, tex_cords).rgb;
 
-        float spec = pow(max(dot(view_direction, reflect_dir), 0.0), material.shininess);
-        vec3 specular = light.specular * spec * textureCube(material.diffuse, tex_cords).rgb;
-
-        vec3 ambience = light.ambience * textureCube(material.diffuse, tex_cords).rgb;
-        
-        specular*=attenuation;
-        ambience*=attenuation;
-        return (diffuse + specular + ambience);
-    }
-    return light.ambience * textureCube(material.diffuse, tex_cords).rgb * attenuation;
+    vec3 ambience = light.ambience * textureCube(material.diffuse, tex_cords).rgb;
+    
+    specular*=attenuation;
+    ambience*=attenuation;
+    diffuse*=intensity;
+    specular*=intensity;
+    return (diffuse + specular + ambience);
     
 }
 
@@ -133,4 +139,5 @@ void main(){
     }
     result *= color;
     gl_FragColor = vec4(result, 1.0) * textureCube(cubemap, tex_cords);
+    // gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1.0/2.2));
 }

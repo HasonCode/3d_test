@@ -34,7 +34,9 @@ CubeRenderer::~CubeRenderer(){
     glDeleteVertexArrays(1,&this->quadVAO);
 }
 void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
-    glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos, glm::vec3 light_color){
+    glm::vec3 size, glm::vec3 rotate, glm::vec3 color, vector<PointLight> point_lights, vector<SpotLight> spot_lights, float shininess){
+        
+    glEnable(GL_FRAMEBUFFER_SRGB); 
     //Begin shader usage
     this->shader.use();
     this->shader.set_sampler("cubemap", 0);
@@ -58,32 +60,39 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
     this->shader.set_matrix4("model",model,true);
     this->shader.set_matrix4("view",view,true);
     this->shader.set_vector3f("color",color,true);
-    this->shader.set_vector3f("light.position", light_pos, true);
     // this->shader.set_vector3f("material.ambience", glm::vec3(0.3f, 0.3f, 0.3f), true);
     this->shader.set_sampler("material.diffuse", 0);
     this->shader.set_sampler("material.specular", 0);
 
     this->shader.set_vector3f("dir_light.direction", glm::vec3(0.0f, -10.0f, -3.0f), true);
-    this->shader.set_vector3f("dir_light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f), true);
-    this->shader.set_vector3f("dir_light.specular", glm::vec3(1.0f, 1.0f, 1.0f), true);
-    this->shader.set_vector3f("dir_light.ambience", glm::vec3(1.0f, 1.0f, 1.0f), true);
+    this->shader.set_vector3f("dir_light.diffuse", glm::vec3(0.05f, 0.05f, 0.05f), true);
+    this->shader.set_vector3f("dir_light.specular", glm::vec3(0.05f, 0.05f, 0.05f), true);
+    this->shader.set_vector3f("dir_light.ambience", glm::vec3(0.05f, 0.05f, 0.05f), true);
+
+    for (int i = 0; i < point_lights.size(); i++){
+        this->shader.set_vector3f("point_lights["+to_string(i)+"]"+".position", point_lights[i].position, true);
+        this->shader.set_vector3f("point_lights["+to_string(i)+"]"+".diffuse", point_lights[i].diffuse, true);
+        this->shader.set_vector3f("point_lights["+to_string(i)+"]"+".specular", point_lights[i].specular, true);
+        this->shader.set_vector3f("point_lights["+to_string(i)+"]"+".ambience", point_lights[i].ambience, true);
+        this->shader.set_float("point_lights["+to_string(i)+"]"+".constant", point_lights[i].constant);
+        this->shader.set_float("point_lights["+to_string(i)+"]"+".linear", point_lights[i].linear);
+        this->shader.set_float("point_lights["+to_string(i)+"]"+".quadratic", point_lights[i].quadratic);
+    }
+    for (int i = 0; i < spot_lights.size(); i++){
+        this->shader.set_vector3f("spot_lights["+to_string(i)+"]"+".position", spot_lights[i].position, true);
+        this->shader.set_vector3f("spot_lights["+to_string(i)+"]"+".diffuse", spot_lights[i].diffuse, true);
+        this->shader.set_vector3f("spot_lights["+to_string(i)+"]"+".specular", spot_lights[i].specular, true);
+        this->shader.set_vector3f("spot_lights["+to_string(i)+"]"+".ambience", spot_lights[i].ambience, true);
+        this->shader.set_float("spot_lights["+to_string(i)+"]"+".constant",spot_lights[i].constant);
+        this->shader.set_float("spot_lights["+to_string(i)+"]"+".linear", spot_lights[i].linear);
+        this->shader.set_float("spot_lights["+to_string(i)+"]"+".quadratic", spot_lights[i].quadratic);
+        this->shader.set_float("spot_lights["+to_string(i)+"]"+".cut_off", spot_lights[i].cut_off);
+        this->shader.set_float("spot_lights["+to_string(i)+"]"+".outer_cut_off", spot_lights[i].outer_cut_off);
+        this->shader.set_vector3f("spot_lights["+to_string(i)+"]"+".direction", spot_lights[i].direction, true);
+    }   
 
 
-    this->shader.set_vector3f("PointLights[0].position", light_pos, true);
-    this->shader.set_vector3f("PointLights[0].diffuse", glm::vec3(1.0f, 1.0f, 1.0f), true);
-    this->shader.set_vector3f("PointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f), true);
-    this->shader.set_vector3f("PointLights[0].ambience", glm::vec3(1.0f, 1.0f, 1.0f), true);
-    this->shader.set_float("PointLights[0].constant",1.0f);
-    this->shader.set_float("PointLights[0].linear", 0.0027f);
-    this->shader.set_float("PointLights[0].quadratic", 0.0015f);
-
-
-    this->shader.set_float("light.constant", 1.0f);
-    this->shader.set_float("light.linear", 0.0027f);
-    this->shader.set_float("light.quadratic", 0.0015f);
-
-
-    this->shader.set_float("material.shininess", 64.0f);
+    this->shader.set_float("material.shininess", shininess);
     glActiveTexture(GL_TEXTURE0);
     texture.bind();
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);

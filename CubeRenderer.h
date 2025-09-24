@@ -18,6 +18,33 @@ using namespace std;
 #ifndef CUBE_RENDERER
 #define CUBE_RENDERER
 
+struct PointLight{
+    glm::vec3 position;
+
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    glm::vec3 ambience;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+
+struct SpotLight{
+    glm::vec3 position;
+    glm::vec3 direction;
+    float cut_off;
+    float outer_cut_off;
+
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    glm::vec3 ambience;
+
+    float constant;
+    float linear;
+    float quadratic;
+};
 
 
 class CubeRenderer{
@@ -29,7 +56,7 @@ class CubeRenderer{
         CubeRenderer(Shader &shader, Camera camera);
         ~CubeRenderer();
         void drawCube(Texture3D &texture, glm::vec3 position,
-            glm::vec3 size, glm::vec3 rotate, glm::vec3 color, glm::vec3 light_pos = glm::vec3(10.0f, 10.0f, 10.0f), glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f));  
+            glm::vec3 size, glm::vec3 rotate, glm::vec3 color, vector<PointLight> point_lights, vector<SpotLight> spot_lights, float shininess);  
     private:
         Shader shader;
         GLuint quadVAO;

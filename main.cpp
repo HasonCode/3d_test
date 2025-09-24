@@ -65,11 +65,14 @@ enum{
     WOOD=4,
     LEAVES=5,
     MOSS=6,
-    GEM=7,
+    GEM=7, 
+    STEEL=8
 };
 
 vector<string> textures;
 vector<block> blocks;
+vector<PointLight> point_lights;
+vector<SpotLight> spot_lights;
 float theta = 0.0;
 void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> blocks){
     glClearColor(0.7,0.7,1.0,1.0);
@@ -83,11 +86,13 @@ void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> 
     Texture3D texture = ResourceManager::get_texture("testing_cube");
     for (int i = 0; i < blocks.size(); i++){
         texture = ResourceManager::get_texture(textures[blocks[i].type]);
-        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, glm::vec3(30,30,30));
+        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, point_lights, spot_lights, 32.0f);
     }
-    renderer.drawCube(texture, glm::vec3(x, y, z), scale, rotation, color);
+    // renderer.drawCube(texture, glm::vec3(x, y, z), scale, rotation, color);
     Texture3D light_texture = ResourceManager::get_texture("white_square");
-    renderer.drawCube(light_texture, glm::vec3(30,30,30), glm::vec3(1,1,1),rotation, glm::vec3(1.0, 1.0, 1.0), glm::vec3(30,30,30));
+    renderer.drawCube(light_texture, glm::vec3(30,30,30), glm::vec3(1,1,1),rotation, glm::vec3(1.0, 1.0, 1.0), vector<PointLight>(), vector<SpotLight>(), 32.0f);
+    renderer.drawCube(light_texture, glm::vec3(40,40,40), glm::vec3(1,1,1),rotation, glm::vec3(1.0, 1.0, 1.0), vector<PointLight>(), vector<SpotLight>(), 32.0f);
+
 }
 
 void render_gui(SDL_Window* window, Shader s, SpriteRenderer renderer){
@@ -301,7 +306,7 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
         prev_y = mousey;
         rotation -= delt_x * turn_speed;
         rotation2 -= delt_y * turn_speed;
-        rotation2 = glm::clamp(rotation2, -1.60f, 1.60f);
+        rotation2 = glm::clamp(rotation2, -1.56f, 1.56f);
         lookx = -look_dist * cos(rotation) * cos(rotation2) + facex;
         lookz = look_dist * sin(rotation) * cos(rotation2) + facez;
         looky = look_dist * sin(rotation2) + facey;
@@ -410,6 +415,13 @@ void main_loop(SDL_Window* window, Shader s, Shader s2, CubeRenderer renderer, S
     }
 }
 
+void lighting_setup(){
+    // point_lights.push_back(PointLight{glm::vec3(30,30,30), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, 0.0, 0.0), 1.0, 0.9, 0.32});
+    for (int i = 0; i < 0; i++){
+        spot_lights.push_back(SpotLight{glm::vec3(i*50, 30, 40), glm::vec3(0, -1, 0), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(37.5f)), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0000, 0.0000, 0.0000), 1.0, 0.09, 0.0032});
+    }
+}
+
 void free_resources(){
     glDeleteProgram(program);
     glDeleteBuffers(1,&vbo_cords);
@@ -457,7 +469,9 @@ int main(int argc, char* argv[]){
     ResourceManager::load_texture("sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "sprites/mossy_cobble.png", "mossy_cobble");
     ResourceManager::load_texture("sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "sprites/gem_block.png", "gem_block");
     ResourceManager::load_texture("sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "sprites/white_square.png", "white_square");
-    textures = {"dirt", "grass", "stone", "cobblestone", "wood", "leaves", "mossy_cobble", "gem_block"};
+    ResourceManager::load_texture("sprites/steel.png", "sprites/steel.png", "sprites/steel.png", "sprites/steel.png", "sprites/steel.png", "sprites/steel.png", "steel");
+    lighting_setup();
+    textures = {"dirt", "grass", "stone", "cobblestone", "wood", "leaves", "mossy_cobble", "gem_block", "steel"};
     ResourceManager::load_shader("shaders/cubemap.vert", "shaders/cubemap.frag", "cubemap");
     ResourceManager::load_shader("shaders/sprite.vert", "shaders/sprite.frag", "sprite");
     Shader s2 = ResourceManager::get_shader("sprite");
@@ -466,38 +480,23 @@ int main(int argc, char* argv[]){
     ResourceManager::load_sprite("sprites/startscreen.png", "startscreen");
     Texture2D sprite = ResourceManager::get_sprite("selector");
     SpriteRenderer spriter(s2);
-    blocks = {make_block(0,0,0,DIRT), make_block(1,0,0,GRASS), make_block(2,0,0,STONE), make_block(3,0,0,COBBLESTONE), make_block(4,0,0,WOOD), make_block(5,0,0,LEAVES)};
-    for (int i = 0; i < 9; i++){
-        for (int j = 0; j < 6; j++){
-            blocks.push_back(make_block(j, 0, (i+1), j));
+
+    for (int i = 0; i < 60; i++){
+        for (int j = 0; j < 9; j++){
+            blocks.push_back(make_block(i, 0, j, STEEL));
         }
     }
-    blocks.push_back(make_block(4,1,4,0));
-
-    for (int i = 0; i < 10; i++){
-        blocks.push_back(make_block(5*i+13, i, 4, MOSS));
-        blocks.push_back(make_block(5*i+13, i, 5, MOSS));
-        blocks.push_back(make_block(5*i+13, i, 6, MOSS));
-        blocks.push_back(make_block(5*i+12, i, 4, MOSS));
-        blocks.push_back(make_block(5*i+12, i, 5, MOSS));
-        blocks.push_back(make_block(5*i+12, i, 6, MOSS));
-        blocks.push_back(make_block(5*i+14, i, 4, MOSS));
-        blocks.push_back(make_block(5*i+14, i, 5, MOSS));
-        blocks.push_back(make_block(5*i+14, i, 6, MOSS));
-
+    for (int i = 0; i < 60; i++){
+        for (int j = 0; j < 7; j++){
+        blocks.push_back(make_block(i, j+1, 0, STEEL));
+        blocks.push_back(make_block(i, j+1, 8, STEEL));
+        }
     }
-    blocks.push_back(make_block(63, 9, 8, MOSS));
-
-    blocks.push_back(make_block(65, 10, 10, MOSS));
-
-    blocks.push_back(make_block(65, 11, 14, MOSS));
-
-    blocks.push_back(make_block(65, 12, 18, MOSS));
-
-    blocks.push_back(make_block(66, 13, 21, MOSS));
-
-    blocks.push_back(make_block(66, 13, 25, GEM));
-
+    for (int i = 0; i < 60; i++){
+        for (int j = 0; j < 9; j++){
+            blocks.push_back(make_block(i, 8, j, STEEL));
+        }
+    }
     
     glViewport(0,0,screen_width,screen_height);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,1);
