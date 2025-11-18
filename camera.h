@@ -9,6 +9,12 @@ class Camera{
         glm::vec3 position;
         glm::vec3 target;
         glm::vec3 up;
+        glm::vec3 right;
+        glm::vec3 down;
+        glm::vec3 left;
+        glm::vec3 front;
+        glm::vec3 back;
+
         float fov;
         float aspect_ratio;
         float near;

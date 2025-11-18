@@ -6,6 +6,12 @@
 
 Camera::Camera(glm::vec3 init_pos, glm::vec3 init_target){
     this->up = glm::vec3(0.0,1.0,0.0);
+    // this->down = glm::vec3(0.0,-1.0,0.0);
+    // this->front = glm::vec3(0.0,0.0,1.0);
+    // this->back = glm::vec3(0.0,0.0,-1.0);
+    // this->left = glm::vec3(1.0,0.0,0.0);
+    // this->right = glm::vec3(-1.0,0.0,0.0);
+
     this->position = init_pos;
     this->target = init_target;
     this->fov = glm::radians(45.0f);
@@ -15,6 +21,11 @@ Camera::Camera(glm::vec3 init_pos, glm::vec3 init_target){
 
 Camera::Camera(){
     this->up = glm::vec3(0.0,1.0,0.0);
+    // this->down = glm::vec3(0.0,-1.0,0.0);
+    // this->front = glm::vec3(0.0,0.0,1.0);
+    // this->back = glm::vec3(0.0,0.0,-1.0);
+    // this->left = glm::vec3(1.0,0.0,0.0);
+    // this->right = glm::vec3(-1.0,0.0,0.0);
     this->position = glm::vec3(0.0f);
     this->target = glm::vec3(0.0f);
     this->fov = glm::radians(45.0f);

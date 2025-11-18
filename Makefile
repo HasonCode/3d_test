@@ -3,8 +3,8 @@ LDLIBS = $(shell sdl2-config --libs) $(shell $(PKG_CONFIG) SDL2_image --libs) -l
 EXTRA_LDLIBS ?= -lGL
 PKG_CONFIG ?= pkg-config
 all: main
-main: shader_utils.o Shader.o Texture3D.o CubeRenderer.o main.o resourcemanager.o SpriteRenderer.o stb.o camera.o Texture2D.o AABB.o
-	g++ -o main shader_utils.o Shader.o Texture3D.o CubeRenderer.o main.o resourcemanager.o SpriteRenderer.o stb.o camera.o Texture2D.o AABB.o $(LDLIBS)
+main: shader_utils.o Shader.o Texture3D.o CubeRenderer.o main.o resourcemanager.o SpriteRenderer.o stb.o camera.o Texture2D.o AABB.o frustrum.o
+	g++ -o main shader_utils.o Shader.o Texture3D.o CubeRenderer.o main.o resourcemanager.o SpriteRenderer.o stb.o camera.o Texture2D.o AABB.o frustrum.o $(LDLIBS)
 clean:
 	rm -f *.o triangle cube sphere
 .PHONY: all clean

@@ -25,6 +25,7 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "SpriteRenderer.h"
+// #include "frustrum.h"
 //Program
 GLint program;
 //Attributes
@@ -84,9 +85,13 @@ void render (SDL_Window* window, Shader s, CubeRenderer renderer, vector<block> 
     glm::vec3 rotation = glm::vec3(0, 0, 0);
     glm::vec3 color = glm::vec3(1.0, 1.0, 1.0);
     Texture3D texture = ResourceManager::get_texture("testing_cube");
+    // Frustrum frustum = extract_frustrum(renderer.camera); 
     for (int i = 0; i < blocks.size(); i++){
         texture = ResourceManager::get_texture(textures[blocks[i].type]);
-        renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, point_lights, spot_lights, 32.0f);
+        // if (is_inside_frustrum(frustum,blocks[i].aabb)){
+            // cout<<blocks[i].x<<" "<<blocks[i].y<<" " << blocks[i].z<<endl;
+            renderer.drawCube(texture, glm::vec3(blocks[i].x*10, blocks[i].y*10, blocks[i].z*10), scale, rotation, color, point_lights, spot_lights, 32.0f);
+        // }
     }
     // renderer.drawCube(texture, glm::vec3(x, y, z), scale, rotation, color);
     Texture3D light_texture = ResourceManager::get_texture("white_square");

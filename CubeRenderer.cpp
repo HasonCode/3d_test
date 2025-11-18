@@ -65,9 +65,9 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
     this->shader.set_sampler("material.specular", 0);
 
     this->shader.set_vector3f("dir_light.direction", glm::vec3(0.0f, -10.0f, -3.0f), true);
-    this->shader.set_vector3f("dir_light.diffuse", glm::vec3(0.05f, 0.05f, 0.05f), true);
-    this->shader.set_vector3f("dir_light.specular", glm::vec3(0.05f, 0.05f, 0.05f), true);
-    this->shader.set_vector3f("dir_light.ambience", glm::vec3(0.05f, 0.05f, 0.05f), true);
+    this->shader.set_vector3f("dir_light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f), true);
+    this->shader.set_vector3f("dir_light.specular", glm::vec3(0.5f, 0.5f, 0.5f), true);
+    this->shader.set_vector3f("dir_light.ambience", glm::vec3(0.5f, 0.5f, 0.5f), true);
 
     for (int i = 0; i < point_lights.size(); i++){
         this->shader.set_vector3f("point_lights["+to_string(i)+"]"+".position", point_lights[i].position, true);
@@ -94,6 +94,11 @@ void CubeRenderer::drawCube(Texture3D &texture, glm::vec3 position,
 
     this->shader.set_float("material.shininess", shininess);
     glActiveTexture(GL_TEXTURE0);
+    // After line 96, before binding:
+    if (texture.ID == 0) {
+        cerr << "Warning: Texture not generated! ID is 0" << endl;
+        return; // or generate it
+    }
     texture.bind();
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
     glEnableVertexAttribArray(this->coord3d);
